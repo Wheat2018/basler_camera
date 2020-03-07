@@ -83,7 +83,6 @@ int main(int argc, char* argv[])
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
             camera.RetrieveResult( 5000, ptrGrabResult, TimeoutHandling_ThrowException);
 
-
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             {
