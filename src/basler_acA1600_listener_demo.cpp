@@ -13,7 +13,6 @@ void photoCallback(const sensor_msgs::ImageConstPtr &msg)
   timeval newT;
   gettimeofday(&newT, NULL);
   
-
   cout<<1000.0 / (1000.0 * (newT.tv_sec - t.tv_sec) + (newT.tv_usec - t.tv_usec) / 1000.0)<<"\t||| ";
   t = newT;
   ROS_INFO("Listener: recieved a photo of size %d * %d. The first pixel: %d",msg->width,msg->height,msg->data[0]);
