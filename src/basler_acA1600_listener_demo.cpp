@@ -12,6 +12,7 @@ void photoCallback(const sensor_msgs::ImageConstPtr &msg)
 {  
   timeval newT;
   gettimeofday(&newT, NULL);
+  
 
   cout<<1000.0 / (1000.0 * (newT.tv_sec - t.tv_sec) + (newT.tv_usec - t.tv_usec) / 1000.0)<<"\t||| ";
   t = newT;
