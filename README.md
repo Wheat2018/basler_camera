@@ -11,4 +11,6 @@ basler相机ros节点
 
 添加环境变量：
 
-$ echo "export LIBRARY_PATH=/opt/pylon5/lib64:$LIBRARY_PATH" >> ~/.bashrc
+$ echo "export LIBRARY_PATH=$LIBRARY_PATH:/opt/pylon5/lib64" >> ~/.bashrc
+$ echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/pylon5/lib64" >> ~/.bashrc
+source ~/.bashrc
