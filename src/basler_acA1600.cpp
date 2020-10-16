@@ -23,6 +23,8 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <pylon/PylonIncludes.h>
+#include <ctime>
+#include <cstring>
 #ifdef PYLON_WIN_BUILD
 #    include <pylon/PylonGUI.h>
 #endif
@@ -34,6 +36,9 @@ using namespace std;
 
 // Number of images to be grabbed.
 size_t photo_count = 0;
+
+// Number of error images
+size_t error_count = 0;
 
 int main(int argc, char* argv[])
 {
@@ -78,6 +83,7 @@ int main(int argc, char* argv[])
         
         // Camera.StopGrabbing() is called automatically by the RetrieveResult() method
         // when c_countOfImagesToGrab images have been retrieved.
+        timeval t;
         while ( camera.IsGrabbing())
         {
             // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
@@ -86,7 +92,14 @@ int main(int argc, char* argv[])
             // Image grabbed successfully?
             if (ptrGrabResult->GrabSucceeded())
             {
-                cout << "Photo " << photo_count++ << endl;
+                timeval newT;
+                gettimeofday(&newT, NULL);
+                
+                cout << "\rSending FPS:" << 1000.0 / (1000.0 * (newT.tv_sec - t.tv_sec) + (newT.tv_usec - t.tv_usec) / 1000.0)
+                     <<  " ||| Photos:"  << photo_count++;
+                if (error_count) cout << " ||| Errors:" << error_count;
+                cout << "                 ";
+                t = newT;
 
                 const uint8_t *pImageBuffer = (uint8_t *) ptrGrabResult->GetBuffer();
                 photo.header = std_msgs::Header();
@@ -98,11 +111,8 @@ int main(int argc, char* argv[])
                 {
                     photo.data.resize(ptrGrabResult->GetImageSize());
                 }
-                for(auto it  = photo.data.begin(); it != photo.data.end(); it++)
-                {
-                    *it = *(pImageBuffer++);
-                }
-                
+                memcpy(&photo.data[0], pImageBuffer, photo.data.size() * sizeof(uint8_t));
+
                 pub.publish(photo);
 
 #ifdef PYLON_WIN_BUILD
@@ -112,7 +122,7 @@ int main(int argc, char* argv[])
             }
             else
             {
-                cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << endl;
+                error_count++;
             }
         }
     }
